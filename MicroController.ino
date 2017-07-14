@@ -16,6 +16,7 @@ String prepareString(decode_results *results) {
   String output=String();
   String intermediate=String();
   int count = results->rawlen;
+  Serial.println("qwe");
   if (results->decode_type == UNKNOWN) {
    output=String("Unknown:");
   }
@@ -69,13 +70,12 @@ String prepareString(decode_results *results) {
       String i5=String((unsigned long) results->rawbuf[i]*USECPERTICK, DEC);
       output=String(output+i5+"_");
     }
-    output=String(output+": ");
+//    output=String(output+": ");
   }
 
   String i3=String(count, DEC);
-  output=String(output+i3+":");
+  output=String(output+":"+i3+":");
   
-  Serial.println(output);
   return output;
 }
 
@@ -89,53 +89,56 @@ void setup() {
 }
 
 void loop() {
+//  BT.println("*******HEYYYYY**********");
+//  delay(100);
+
+/**
+  if (irrecv.decode(&results)) {
+      String outputResult=prepareString(&results);
+      Serial.println("SENDING DATA "+outputResult);
+      for(int i=0;i<1;i++){
+        BT.println("*****"+outputResult+"+++++");
+        delay(20);
+      }
+      
+
+      irrecv.resume(); // Receive the next value
+  }
+**/
+
 
   if (BT.available())
   {
-     char a=(BT.read());
-     Serial.println(a);
-     if(a=='+'){
+     String read=String();   
+     while(BT.available()){
+      
+        char a=(BT.read());
+        read=String(read+a);
+        delay(5);
+     }
+     if(read.equals("?READ?")){
+      Serial.println("Calling reading function");
       sendToPhone();
      }
-     else if(a=='*'){
-      receiveFromPhone();
-     } 
+     delay(200);
    }  
-/*
-  if (irrecv.decode(&results)) {
-    Serial.println("************************");
-    String outputResult=prepareString(&results);
-    delay(100);
-    Serial.println("************************");
-    irrecv.resume(); // Receive the next value
-    BT.println("aaa");
-//    BT.println(
-//      results.decode_type+':'+
-//      results.address+':'+
-//      results.value+':'+
-//      results.bits+':'+
-//      results.&rawbuf+':'+
-//      results.rawlen+':'+
-//      results.overflow
-//    );
-    //BT.write(results.value);
-  }
-  delay(100);
-  if (BT.available())
-  {
-   char a=(BT.read());
-   Serial.println(a);
-  }  
-  */
+
 }
 
 void sendToPhone(){
-    if (irrecv.decode(&results)) {
-      String outputResult=prepareString(&results);
-      delay(100);
-      irrecv.resume(); // Receive the next value
-      BT.println(outputResult);
-    }
+      if (irrecv.decode(&results)) {
+        String outputResult=prepareString(&results);
+        Serial.println("SENDING DATA "+outputResult);
+        for(int i=0;i<1;i++){
+          BT.println("*****"+outputResult+"+++++");
+          delay(20);
+        }
+        
+  
+        irrecv.resume(); // Receive the next value
+      }
+
+      Serial.println("End send to phone");
 }
 
 void receiveFromPhone(){
